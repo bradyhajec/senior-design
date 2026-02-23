@@ -1,0 +1,105 @@
+'use client';
+import Link from 'next/link';
+import { Plant, getHealthColor, getHealthLabel } from '@/lib/store';
+
+interface PlantCardProps {
+  plant: Plant;
+}
+
+export default function PlantCard({ plant }: PlantCardProps) {
+  const latestAssessment = plant.assessments[0] ?? null;
+  const healthScore = latestAssessment?.healthScore ?? 0;
+  const healthColor = getHealthColor(healthScore);
+  const healthLabel = getHealthLabel(healthScore);
+
+  const nextReminder = plant.reminders.find(r => r.enabled);
+
+  return (
+    <Link href={`/plants/${plant.plantId}`}>
+      <div className="group bg-cream-100 border border-forest-200/30 rounded-2xl overflow-hidden hover:shadow-lg hover:shadow-forest-700/10 hover:-translate-y-1 transition-all duration-300 cursor-pointer">
+        {/* Image */}
+        <div className="relative h-48 bg-forest-100 overflow-hidden">
+          {plant.photoBase64 ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={plant.photoBase64}
+              alt={plant.nickname}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <svg viewBox="0 0 80 100" className="w-16 h-20 opacity-20" fill="#1a3a2a">
+                <path d="M40 5 C25 20 10 35 40 75 C70 35 55 20 40 5z" />
+                <path d="M40 15 C55 30 65 45 40 75" stroke="#1a3a2a" strokeWidth="1.5" fill="none" />
+                <rect x="36" y="75" width="8" height="20" rx="4" />
+              </svg>
+            </div>
+          )}
+
+          {/* Health badge */}
+          {latestAssessment && (
+            <div
+              className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-semibold text-white shadow-sm"
+              style={{ backgroundColor: healthColor }}
+            >
+              {healthLabel}
+            </div>
+          )}
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <h3
+                className="text-xl font-medium text-forest-700 leading-tight"
+                style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontWeight: 600 }}
+              >
+                {plant.nickname}
+              </h3>
+              <p className="text-sm text-forest-500 mt-0.5 italic">{plant.species || 'Unidentified'}</p>
+            </div>
+
+            {latestAssessment && (
+              <div className="flex-shrink-0 text-right">
+                <div
+                  className="text-2xl font-semibold"
+                  style={{ color: healthColor, fontFamily: 'Cormorant Garamond, Georgia, serif' }}
+                >
+                  {healthScore}
+                </div>
+                <div className="text-xs text-forest-400">/100</div>
+              </div>
+            )}
+          </div>
+
+          {/* Health bar */}
+          {latestAssessment && (
+            <div className="mt-3 h-1.5 bg-forest-100 rounded-full overflow-hidden">
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{ width: `${healthScore}%`, backgroundColor: healthColor }}
+              />
+            </div>
+          )}
+
+          {/* Next reminder */}
+          {nextReminder && (
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-forest-500">
+              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current" strokeWidth="2">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l3 3" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              Next: {nextReminder.reminderType} · {nextReminder.schedule}
+            </div>
+          )}
+
+          {/* No assessment yet */}
+          {!latestAssessment && (
+            <div className="mt-3 text-xs text-forest-400 italic">No assessment yet — tap to analyze</div>
+          )}
+        </div>
+      </div>
+    </Link>
+  );
+}
