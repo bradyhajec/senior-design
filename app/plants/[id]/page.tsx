@@ -184,11 +184,10 @@ export default function PlantDetailPage() {
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                activeTab === tab
+              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === tab
                   ? 'bg-cream-100 text-forest-700 shadow-sm'
                   : 'text-forest-500 hover:text-forest-600'
-              }`}
+                }`}
             >
               {label}
             </button>
@@ -208,14 +207,20 @@ export default function PlantDetailPage() {
                 >
                   Current Care Plan
                 </h3>
-                <div className="space-y-2">
-                  {latestAssessment.recommendations.map((rec, i) => (
-                    <div key={i} className="flex items-start gap-3 py-2 border-b border-forest-100 last:border-0">
-                      <span className="text-lg flex-shrink-0">{categoryIcons[rec.category] ?? '✦'}</span>
-                      <p className="text-sm text-forest-600 leading-relaxed">{rec.actionText}</p>
-                    </div>
-                  ))}
-                </div>
+                {latestAssessment.recommendations.length === 0 ? (
+                  <div className="py-6 text-center">
+                    <p className="text-forest-400 italic">No current recommendations.</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {latestAssessment.recommendations.map((rec, i) => (
+                      <div key={i} className="flex items-start gap-3 py-2 border-b border-forest-100 last:border-0">
+                        <span className="text-lg flex-shrink-0">{categoryIcons[rec.category] ?? '✦'}</span>
+                        <p className="text-sm text-forest-600 leading-relaxed">{rec.actionText}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {latestAssessment.rawAnalysis && (
@@ -318,20 +323,18 @@ export default function PlantDetailPage() {
                 plant.reminders.map((reminder: Reminder) => (
                   <div
                     key={reminder.reminderId}
-                    className={`bg-cream-100 border rounded-2xl p-5 flex items-center justify-between transition-all duration-200 ${
-                      reminder.enabled ? 'border-forest-200/40' : 'border-forest-100 opacity-60'
-                    }`}
+                    className={`bg-cream-100 border rounded-2xl p-5 flex items-center justify-between transition-all duration-200 ${reminder.enabled ? 'border-forest-200/40' : 'border-forest-100 opacity-60'
+                      }`}
                   >
                     <div className="flex items-center gap-4">
                       <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${
-                          reminder.enabled ? 'bg-forest-100' : 'bg-cream-300'
-                        }`}
+                        className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${reminder.enabled ? 'bg-forest-100' : 'bg-cream-300'
+                          }`}
                       >
                         {reminder.reminderType === 'Watering' ? '💧'
                           : reminder.reminderType === 'Fertilizing' ? '🌱'
-                          : reminder.reminderType === 'Pruning' ? '✂️'
-                          : '🌿'}
+                            : reminder.reminderType === 'Pruning' ? '✂️'
+                              : '🌿'}
                       </div>
                       <div>
                         <p className="font-medium text-forest-700">{reminder.reminderType}</p>
@@ -340,14 +343,12 @@ export default function PlantDetailPage() {
                     </div>
                     <button
                       onClick={() => toggleReminder(reminder.reminderId)}
-                      className={`relative w-12 h-6 rounded-full transition-all duration-200 ${
-                        reminder.enabled ? 'bg-forest-600' : 'bg-forest-200'
-                      }`}
+                      className={`relative w-12 h-6 rounded-full transition-all duration-200 ${reminder.enabled ? 'bg-forest-600' : 'bg-forest-200'
+                        }`}
                     >
                       <div
-                        className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-200 ${
-                          reminder.enabled ? 'left-7' : 'left-1'
-                        }`}
+                        className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-200 ${reminder.enabled ? 'left-7' : 'left-1'
+                          }`}
                       />
                     </button>
                   </div>

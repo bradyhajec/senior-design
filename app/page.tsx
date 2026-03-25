@@ -31,7 +31,6 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative overflow-hidden pt-16 pb-12 px-4 sm:px-6">
-        {/* Decorative background leaves */}
         <div className="absolute top-0 right-0 w-64 h-64 opacity-5 pointer-events-none">
           <svg viewBox="0 0 200 200" fill="#1a3a2a">
             <path d="M100 10 C60 40 20 80 100 170 C180 80 140 40 100 10z" />
@@ -72,7 +71,6 @@ export default function HomePage() {
       <main className="max-w-6xl mx-auto px-4 sm:px-6 pb-20">
 
         {plants.length === 0 ? (
-          // Empty state
           <div className="text-center py-24 opacity-0 animate-fade-up anim-delay-400" style={{ animationFillMode: 'forwards' }}>
             <div className="inline-flex items-center justify-center w-24 h-24 rounded-full bg-forest-100 mb-6">
               <svg viewBox="0 0 60 75" className="w-10 h-12" fill="none">
@@ -88,7 +86,7 @@ export default function HomePage() {
               No plants yet
             </h2>
             <p className="text-forest-400 mb-8 max-w-sm mx-auto">
-              Analyze your first plant to identify it, assess its health, and get personalized care recommendations.
+              Analyze your first plant to identify it and get personalized care recommendations.
             </p>
             <Link
               href="/analyze"
@@ -104,7 +102,7 @@ export default function HomePage() {
           <>
             {/* Stats bar */}
             <div
-              className="grid grid-cols-3 gap-4 mb-10 opacity-0 animate-fade-up anim-delay-300"
+              className="grid grid-cols-2 gap-4 mb-10 opacity-0 animate-fade-up anim-delay-300"
               style={{ animationFillMode: 'forwards' }}
             >
               {[
@@ -113,23 +111,13 @@ export default function HomePage() {
                   label: 'Assessments',
                   value: plants.reduce((acc, p) => acc + p.assessments.length, 0),
                 },
-                {
-                  label: 'Avg. Health',
-                  value: plants.reduce((acc, p) => {
-                    const s = p.assessments[0]?.healthScore ?? 0;
-                    return acc + s;
-                  }, 0) / (plants.filter(p => p.assessments.length > 0).length || 1),
-                  suffix: '/100',
-                  isFloat: true,
-                },
               ].map((stat) => (
                 <div key={stat.label} className="bg-cream-100 border border-forest-200/30 rounded-2xl p-4 sm:p-6 text-center">
                   <div
                     className="text-3xl sm:text-4xl font-light text-forest-700"
                     style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
                   >
-                    {stat.isFloat ? Math.round(stat.value as number) : stat.value}
-                    {stat.suffix && <span className="text-xl text-forest-400">{stat.suffix}</span>}
+                    {stat.value}
                   </div>
                   <div className="text-xs sm:text-sm text-forest-400 mt-1">{stat.label}</div>
                 </div>
@@ -144,7 +132,6 @@ export default function HomePage() {
               {plants.map((plant) => (
                 <div key={plant.plantId} className="relative group">
                   <PlantCard plant={plant} />
-                  {/* Delete button */}
                   <button
                     onClick={(e) => handleDelete(e, plant.plantId)}
                     className="absolute top-3 left-3 w-8 h-8 bg-black/40 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-white hover:bg-red-600 z-10"
@@ -157,7 +144,6 @@ export default function HomePage() {
                 </div>
               ))}
 
-              {/* Add new card */}
               <Link
                 href="/analyze"
                 className="border-2 border-dashed border-forest-300/50 rounded-2xl flex flex-col items-center justify-center gap-3 p-8 text-center hover:border-forest-400 hover:bg-forest-50/50 transition-all duration-200 min-h-[280px] group"

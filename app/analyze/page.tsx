@@ -113,12 +113,13 @@ export default function AnalyzePage() {
       }
 
       const plantId = uuidv4();
+      // if we want iamge to show up in the my plants section probably need to store it elsewhere
       const plant: Plant = {
         plantId,
         nickname: nickname || data.nickname_suggestion || data.species,
         species: data.species,
         createdAt: new Date().toISOString(),
-        photoBase64: imagePreview || undefined,
+        photoBase64: undefined, // doesn't keep image front end in storage
         reminders: data.reminders.map(r => ({
           reminderId: uuidv4(),
           reminderType: r.reminderType,
@@ -129,7 +130,7 @@ export default function AnalyzePage() {
         assessments: [{
           assessmentId: uuidv4(),
           timestamp: new Date().toISOString(),
-          photoBase64: imagePreview || undefined,
+          photoBase64: undefined, // doesn't keep image in front end storage
           symptomReport: symptoms ? { text: symptoms } : null,
           prediction: { label: data.species, confidence: data.confidence },
           recommendations: data.recommendations.map(r => ({
@@ -179,11 +180,10 @@ export default function AnalyzePage() {
           <div className="flex items-center gap-3 mb-8">
             {[{ id: 'upload', label: 'Photo & Symptoms' }, { id: 'details', label: 'Environment' }].map((s, i) => (
               <div key={s.id} className="flex items-center gap-3">
-                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 ${
-                  step === s.id ? 'bg-forest-700 text-cream-100' :
-                  (step === 'details' && s.id === 'upload') ? 'bg-sage-400 text-white' :
-                  'bg-forest-100 text-forest-400'
-                }`}>
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200 ${step === s.id ? 'bg-forest-700 text-cream-100' :
+                    (step === 'details' && s.id === 'upload') ? 'bg-sage-400 text-white' :
+                      'bg-forest-100 text-forest-400'
+                  }`}>
                   {(step === 'details' && s.id === 'upload') ? (
                     <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current" strokeWidth="2.5">
                       <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
@@ -205,13 +205,12 @@ export default function AnalyzePage() {
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onClick={() => fileInputRef.current?.click()}
-              className={`relative cursor-pointer rounded-2xl border-2 transition-all duration-200 overflow-hidden ${
-                dragging
+              className={`relative cursor-pointer rounded-2xl border-2 transition-all duration-200 overflow-hidden ${dragging
                   ? 'border-forest-500 bg-forest-50'
                   : imagePreview
-                  ? 'border-transparent'
-                  : 'border-dashed border-forest-300 hover:border-forest-400 bg-cream-100 hover:bg-forest-50/30'
-              }`}
+                    ? 'border-transparent'
+                    : 'border-dashed border-forest-300 hover:border-forest-400 bg-cream-100 hover:bg-forest-50/30'
+                }`}
               style={{ minHeight: '280px' }}
             >
               <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileChange} />
@@ -299,11 +298,10 @@ export default function AnalyzePage() {
                   <button
                     key={opt.value}
                     onClick={() => setEnvDetails(d => ({ ...d, lightLevel: opt.value as EnvironmentalDetails['lightLevel'] }))}
-                    className={`p-3 rounded-xl border-2 text-left transition-all duration-200 ${
-                      envDetails.lightLevel === opt.value
+                    className={`p-3 rounded-xl border-2 text-left transition-all duration-200 ${envDetails.lightLevel === opt.value
                         ? 'border-forest-600 bg-forest-700 text-cream-100'
                         : 'border-forest-200 bg-cream-100 text-forest-600 hover:border-forest-400'
-                    }`}
+                      }`}
                   >
                     <div className="text-2xl mb-1">{opt.icon}</div>
                     <div className="text-xs font-medium">{opt.label}</div>
@@ -320,11 +318,10 @@ export default function AnalyzePage() {
                   <button
                     key={p}
                     onClick={() => setEnvDetails(d => ({ ...d, placement: p as 'indoor' | 'outdoor' }))}
-                    className={`flex-1 py-3 rounded-xl border-2 font-medium capitalize transition-all duration-200 ${
-                      envDetails.placement === p
+                    className={`flex-1 py-3 rounded-xl border-2 font-medium capitalize transition-all duration-200 ${envDetails.placement === p
                         ? 'border-forest-600 bg-forest-700 text-cream-100'
                         : 'border-forest-200 bg-cream-100 text-forest-600 hover:border-forest-400'
-                    }`}
+                      }`}
                   >
                     {p === 'indoor' ? '🏠 Indoor' : '🌿 Outdoor'}
                   </button>
@@ -339,11 +336,10 @@ export default function AnalyzePage() {
                   <button
                     key={h.v}
                     onClick={() => setEnvDetails(d => ({ ...d, humidity: h.v as EnvironmentalDetails['humidity'] }))}
-                    className={`flex-1 py-3 rounded-xl border-2 font-medium transition-all duration-200 ${
-                      envDetails.humidity === h.v
+                    className={`flex-1 py-3 rounded-xl border-2 font-medium transition-all duration-200 ${envDetails.humidity === h.v
                         ? 'border-forest-600 bg-forest-700 text-cream-100'
                         : 'border-forest-200 bg-cream-100 text-forest-600 hover:border-forest-400'
-                    }`}
+                      }`}
                   >
                     {h.l}
                   </button>
@@ -479,19 +475,25 @@ export default function AnalyzePage() {
               >
                 Care Recommendations
               </h3>
-              <div className="space-y-2">
-                {result.recommendations.map((rec, i) => {
-                  const categoryIcons: Record<string, string> = {
-                    watering: '💧', light: '☀️', soil: '🪴', fertilizing: '🌱', pest: '🐛', general: '✦',
-                  };
-                  return (
-                    <div key={i} className="bg-cream-100 border border-forest-200/40 rounded-xl px-4 py-3 flex items-start gap-3">
-                      <span className="text-lg flex-shrink-0 mt-0.5">{categoryIcons[rec.category] ?? '✦'}</span>
-                      <p className="text-sm text-forest-600 leading-relaxed">{rec.actionText}</p>
-                    </div>
-                  );
-                })}
-              </div>
+              {result.recommendations.length === 0 ? (
+                <div className="bg-cream-100 border border-forest-200/30 rounded-2xl p-8 text-center">
+                  <p className="text-forest-400 italic">No current recommendations.</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {result.recommendations.map((rec, i) => {
+                    const categoryIcons: Record<string, string> = {
+                      watering: '💧', light: '☀️', soil: '🪴', fertilizing: '🌱', pest: '🐛', general: '✦',
+                    };
+                    return (
+                      <div key={i} className="bg-cream-100 border border-forest-200/40 rounded-xl px-4 py-3 flex items-start gap-3">
+                        <span className="text-lg flex-shrink-0 mt-0.5">{categoryIcons[rec.category] ?? '✦'}</span>
+                        <p className="text-sm text-forest-600 leading-relaxed">{rec.actionText}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             {result.reminders.length > 0 && (
