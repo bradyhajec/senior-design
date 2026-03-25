@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { Plant, getHealthColor, getHealthLabel } from '@/lib/store';
+import { Plant } from '@/lib/store';
 
 interface PlantCardProps {
   plant: Plant;
@@ -8,10 +8,6 @@ interface PlantCardProps {
 
 export default function PlantCard({ plant }: PlantCardProps) {
   const latestAssessment = plant.assessments[0] ?? null;
-  const healthScore = latestAssessment?.healthScore ?? 0;
-  const healthColor = getHealthColor(healthScore);
-  const healthLabel = getHealthLabel(healthScore);
-
   const nextReminder = plant.reminders.find(r => r.enabled);
 
   return (
@@ -35,16 +31,6 @@ export default function PlantCard({ plant }: PlantCardProps) {
               </svg>
             </div>
           )}
-
-          {/* Health badge */}
-          {latestAssessment && (
-            <div
-              className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-xs font-semibold text-white shadow-sm"
-              style={{ backgroundColor: healthColor }}
-            >
-              {healthLabel}
-            </div>
-          )}
         </div>
 
         {/* Content */}
@@ -59,29 +45,7 @@ export default function PlantCard({ plant }: PlantCardProps) {
               </h3>
               <p className="text-sm text-forest-500 mt-0.5 italic">{plant.species || 'Unidentified'}</p>
             </div>
-
-            {latestAssessment && (
-              <div className="flex-shrink-0 text-right">
-                <div
-                  className="text-2xl font-semibold"
-                  style={{ color: healthColor, fontFamily: 'Cormorant Garamond, Georgia, serif' }}
-                >
-                  {healthScore}
-                </div>
-                <div className="text-xs text-forest-400">/100</div>
-              </div>
-            )}
           </div>
-
-          {/* Health bar */}
-          {latestAssessment && (
-            <div className="mt-3 h-1.5 bg-forest-100 rounded-full overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-500"
-                style={{ width: `${healthScore}%`, backgroundColor: healthColor }}
-              />
-            </div>
-          )}
 
           {/* Next reminder */}
           {nextReminder && (

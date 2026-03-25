@@ -36,7 +36,6 @@ export interface Assessment {
   prediction: Prediction | null;
   recommendations: Recommendation[];
   rawAnalysis: string;
-  healthScore: number; // 0-100
   clarifyingQuestions: string[];
   answers: { question: string; answer: string }[];
   feedback: Feedback | null;
@@ -98,18 +97,4 @@ export function upsertPlant(plant: Plant): void {
 export function deletePlant(id: string): void {
   const plants = getPlants().filter(p => p.plantId !== id);
   savePlants(plants);
-}
-
-export function getHealthColor(score: number): string {
-  if (score >= 75) return '#3d6b3f';
-  if (score >= 50) return '#8faa8b';
-  if (score >= 25) return '#c4714a';
-  return '#a85c37';
-}
-
-export function getHealthLabel(score: number): string {
-  if (score >= 75) return 'Thriving';
-  if (score >= 50) return 'Needs Attention';
-  if (score >= 25) return 'Struggling';
-  return 'Critical';
 }
