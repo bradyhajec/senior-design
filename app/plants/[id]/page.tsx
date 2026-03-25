@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/Header';
-import { Plant, getPlantById, upsertPlant, getHealthColor, getHealthLabel, Reminder } from '@/lib/store';
+import { Plant, getPlantById, upsertPlant, Reminder } from '@/lib/store';
 import { format } from 'date-fns';
 
 export default function PlantDetailPage() {
@@ -40,9 +40,6 @@ export default function PlantDetailPage() {
   }
 
   const latestAssessment = plant.assessments[0] ?? null;
-  const healthScore = latestAssessment?.healthScore ?? 0;
-  const healthColor = getHealthColor(healthScore);
-  const healthLabel = getHealthLabel(healthScore);
 
   const toggleReminder = (reminderId: string) => {
     const updated = {
@@ -147,25 +144,7 @@ export default function PlantDetailPage() {
                   Added {format(new Date(plant.createdAt), 'MMM d, yyyy')}
                 </p>
               </div>
-
-              {latestAssessment && (
-                <div className="text-center flex-shrink-0">
-                  <div
-                    className="text-5xl font-light"
-                    style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', color: healthColor }}
-                  >
-                    {healthScore}
-                  </div>
-                  <div className="text-xs font-medium" style={{ color: healthColor }}>{healthLabel}</div>
-                </div>
-              )}
             </div>
-
-            {latestAssessment && (
-              <div className="mt-4 h-2 bg-forest-100 rounded-full overflow-hidden">
-                <div className="h-full rounded-full" style={{ width: `${healthScore}%`, backgroundColor: healthColor }} />
-              </div>
-            )}
 
             {plant.environmentalDetails && (
               <div className="mt-4 flex flex-wrap gap-2">
@@ -222,7 +201,6 @@ export default function PlantDetailPage() {
           {/* Overview tab */}
           {activeTab === 'overview' && latestAssessment && (
             <div className="space-y-5">
-              {/* Latest recommendations */}
               <div className="bg-cream-100 border border-forest-200/30 rounded-2xl p-5">
                 <h3
                   className="text-xl font-medium text-forest-700 mb-4"
@@ -240,7 +218,6 @@ export default function PlantDetailPage() {
                 </div>
               </div>
 
-              {/* Detailed analysis */}
               {latestAssessment.rawAnalysis && (
                 <div className="bg-cream-100 border border-forest-200/30 rounded-2xl p-5">
                   <h3
@@ -263,7 +240,6 @@ export default function PlantDetailPage() {
                 </div>
               )}
 
-              {/* Feedback */}
               {!latestAssessment.feedback && !feedbackSubmitted[latestAssessment.assessmentId] && (
                 <div className="bg-cream-200 border border-forest-200/30 rounded-2xl p-5 text-center">
                   <p className="text-sm text-forest-600 mb-3">Was this analysis helpful?</p>
@@ -319,18 +295,6 @@ export default function PlantDetailPage() {
                           <p className="text-xs text-forest-400 mt-1 italic">&ldquo;{assessment.symptomReport.text}&rdquo;</p>
                         )}
                       </div>
-                      <div
-                        className="text-3xl font-light"
-                        style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', color: getHealthColor(assessment.healthScore) }}
-                      >
-                        {assessment.healthScore}
-                      </div>
-                    </div>
-                    <div className="h-1.5 bg-forest-100 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full"
-                        style={{ width: `${assessment.healthScore}%`, backgroundColor: getHealthColor(assessment.healthScore) }}
-                      />
                     </div>
                     {assessment.prediction && (
                       <p className="text-xs text-forest-400 mt-2">

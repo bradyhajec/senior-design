@@ -11,8 +11,6 @@ interface AnalysisResult {
   species: string;
   nickname_suggestion: string;
   confidence: number;
-  healthScore: number;
-  healthSummary: string;
   issues: string[];
   recommendations: Array<{ actionText: string; category: string }>;
   reminders: Array<{ reminderType: string; schedule: string }>;
@@ -32,14 +30,12 @@ export default function AnalyzePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState<Step>('upload');
 
-  // Upload state
   const [imageBase64, setImageBase64] = useState<string>('');
   const [imagePreview, setImagePreview] = useState<string>('');
   const [imageMediaType, setImageMediaType] = useState<string>('image/jpeg');
   const [symptoms, setSymptoms] = useState('');
   const [dragging, setDragging] = useState(false);
 
-  // Details state
   const [envDetails, setEnvDetails] = useState<EnvironmentalDetails>({
     lightLevel: 'bright-indirect',
     placement: 'indoor',
@@ -49,7 +45,6 @@ export default function AnalyzePage() {
   });
   const [nickname, setNickname] = useState('');
 
-  // Analysis state
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [error, setError] = useState('');
   const [savedPlantId, setSavedPlantId] = useState('');
@@ -64,7 +59,6 @@ export default function AnalyzePage() {
     reader.onload = (e) => {
       const dataUrl = e.target?.result as string;
       setImagePreview(dataUrl);
-      // Extract base64 part
       const base64 = dataUrl.split(',')[1];
       setImageBase64(base64);
     };
@@ -114,12 +108,10 @@ export default function AnalyzePage() {
       const data: AnalysisResult = await res.json();
       setResult(data);
 
-      // Auto-set nickname from suggestion if not set
       if (!nickname && data.nickname_suggestion) {
         setNickname(data.nickname_suggestion);
       }
 
-      // Save plant
       const plantId = uuidv4();
       const plant: Plant = {
         plantId,
@@ -145,7 +137,6 @@ export default function AnalyzePage() {
             category: r.category as never,
           })),
           rawAnalysis: data.detailedAnalysis,
-          healthScore: data.healthScore,
           clarifyingQuestions: data.clarifyingQuestions,
           answers: [],
           feedback: null,
@@ -162,19 +153,11 @@ export default function AnalyzePage() {
     }
   };
 
-  const healthColor = result
-    ? result.healthScore >= 75 ? '#3d6b3f'
-      : result.healthScore >= 50 ? '#8faa8b'
-      : result.healthScore >= 25 ? '#c4714a'
-      : '#a85c37'
-    : '#3d6b3f';
-
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f5f0e8' }}>
       <Header />
 
       <main className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
-        {/* Page header */}
         <div className="mb-10">
           <p className="text-terracotta-500 text-sm font-medium tracking-widest uppercase mb-3">
             AI Analysis
@@ -192,7 +175,6 @@ export default function AnalyzePage() {
           )}
         </div>
 
-        {/* Step indicator */}
         {step !== 'analyzing' && step !== 'result' && (
           <div className="flex items-center gap-3 mb-8">
             {[{ id: 'upload', label: 'Photo & Symptoms' }, { id: 'details', label: 'Environment' }].map((s, i) => (
@@ -215,10 +197,9 @@ export default function AnalyzePage() {
           </div>
         )}
 
-        {/* ===== STEP 1: Upload ===== */}
+        {/* STEP 1: Upload */}
         {step === 'upload' && (
           <div className="space-y-6 animate-fade-up opacity-0" style={{ animationFillMode: 'forwards' }}>
-            {/* Drop zone */}
             <div
               onDrop={handleDrop}
               onDragOver={handleDragOver}
@@ -272,7 +253,6 @@ export default function AnalyzePage() {
               )}
             </div>
 
-            {/* Symptoms */}
             <div>
               <label className="block text-sm font-medium text-forest-600 mb-2">
                 Observed Symptoms <span className="text-forest-400 font-normal">(optional but recommended)</span>
@@ -286,7 +266,6 @@ export default function AnalyzePage() {
               />
             </div>
 
-            {/* Nickname */}
             <div>
               <label className="block text-sm font-medium text-forest-600 mb-2">
                 Give your plant a nickname <span className="text-forest-400 font-normal">(optional)</span>
@@ -310,11 +289,9 @@ export default function AnalyzePage() {
           </div>
         )}
 
-        {/* ===== STEP 2: Environment Details ===== */}
+        {/* STEP 2: Environment Details */}
         {step === 'details' && (
           <div className="space-y-8 animate-fade-up opacity-0" style={{ animationFillMode: 'forwards' }}>
-
-            {/* Light level */}
             <div>
               <label className="block text-sm font-medium text-forest-600 mb-3">Light Conditions</label>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -336,7 +313,6 @@ export default function AnalyzePage() {
               </div>
             </div>
 
-            {/* Indoor/Outdoor */}
             <div>
               <label className="block text-sm font-medium text-forest-600 mb-3">Placement</label>
               <div className="flex gap-3">
@@ -356,7 +332,6 @@ export default function AnalyzePage() {
               </div>
             </div>
 
-            {/* Humidity */}
             <div>
               <label className="block text-sm font-medium text-forest-600 mb-3">Humidity Level</label>
               <div className="flex gap-3">
@@ -376,7 +351,6 @@ export default function AnalyzePage() {
               </div>
             </div>
 
-            {/* Soil and Pot */}
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-forest-600 mb-2">Soil Type <span className="text-forest-400 font-normal">(optional)</span></label>
@@ -426,7 +400,7 @@ export default function AnalyzePage() {
           </div>
         )}
 
-        {/* ===== ANALYZING ===== */}
+        {/* ANALYZING */}
         {step === 'analyzing' && (
           <div className="flex flex-col items-center justify-center py-24 text-center animate-fade-in opacity-0" style={{ animationFillMode: 'forwards' }}>
             <div className="relative w-24 h-24 mb-8">
@@ -446,57 +420,35 @@ export default function AnalyzePage() {
               Analyzing your plant
             </h2>
             <p className="text-forest-400 animate-pulse-soft">
-              Identifying species, assessing health, crafting care plan...
+              Identifying species and crafting care plan...
             </p>
           </div>
         )}
 
-        {/* ===== RESULT ===== */}
+        {/* RESULT */}
         {step === 'result' && result && (
           <div className="space-y-6 animate-fade-up opacity-0" style={{ animationFillMode: 'forwards' }}>
-            {/* Hero result card */}
             <div className="bg-cream-100 border border-forest-200/30 rounded-2xl overflow-hidden">
               {imagePreview && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={imagePreview} alt="Plant" className="w-full h-48 object-cover" />
               )}
               <div className="p-6">
-                <div className="flex items-start justify-between gap-4">
-                  <div>
-                    <h2
-                      className="text-3xl font-medium text-forest-700"
-                      style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
-                    >
-                      {nickname || result.nickname_suggestion}
-                    </h2>
-                    <p className="text-forest-500 italic mt-0.5">{result.species}</p>
-                    <p className="text-sm text-forest-400 mt-1">
-                      {Math.round(result.confidence * 100)}% identification confidence
-                    </p>
-                  </div>
-                  <div className="text-center flex-shrink-0">
-                    <div
-                      className="text-5xl font-light"
-                      style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', color: healthColor }}
-                    >
-                      {result.healthScore}
-                    </div>
-                    <div className="text-xs text-forest-400">/100 health</div>
-                  </div>
+                <div>
+                  <h2
+                    className="text-3xl font-medium text-forest-700"
+                    style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
+                  >
+                    {nickname || result.nickname_suggestion}
+                  </h2>
+                  <p className="text-forest-500 italic mt-0.5">{result.species}</p>
+                  <p className="text-sm text-forest-400 mt-1">
+                    {Math.round(result.confidence * 100)}% identification confidence
+                  </p>
                 </div>
-
-                <div className="mt-4 h-2 bg-forest-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${result.healthScore}%`, backgroundColor: healthColor }}
-                  />
-                </div>
-
-                <p className="text-forest-500 text-sm mt-4 leading-relaxed">{result.healthSummary}</p>
               </div>
             </div>
 
-            {/* Issues */}
             {result.issues.length > 0 && (
               <div className="bg-terracotta-400/10 border border-terracotta-400/30 rounded-2xl p-5">
                 <h3
@@ -507,7 +459,7 @@ export default function AnalyzePage() {
                     <circle cx="12" cy="12" r="10" />
                     <path d="M12 8v5M12 16v.5" strokeLinecap="round" />
                   </svg>
-                  Detected Issues
+                  Common Issues to Watch For
                 </h3>
                 <ul className="space-y-1.5">
                   {result.issues.map((issue, i) => (
@@ -520,7 +472,6 @@ export default function AnalyzePage() {
               </div>
             )}
 
-            {/* Recommendations */}
             <div>
               <h3
                 className="text-xl font-medium text-forest-700 mb-3"
@@ -543,7 +494,6 @@ export default function AnalyzePage() {
               </div>
             </div>
 
-            {/* Reminders */}
             {result.reminders.length > 0 && (
               <div className="bg-sage-300/20 border border-sage-300/40 rounded-2xl p-5">
                 <h3
@@ -563,7 +513,6 @@ export default function AnalyzePage() {
               </div>
             )}
 
-            {/* Detailed analysis */}
             {result.detailedAnalysis && (
               <div className="bg-cream-100 border border-forest-200/30 rounded-2xl p-6">
                 <h3
@@ -589,7 +538,6 @@ export default function AnalyzePage() {
               </div>
             )}
 
-            {/* Clarifying questions */}
             {result.clarifyingQuestions.length > 0 && (
               <div className="bg-cream-200 border border-forest-200/30 rounded-2xl p-5">
                 <h3 className="text-sm font-medium text-forest-600 mb-2">💬 For a more accurate analysis:</h3>
@@ -607,7 +555,6 @@ export default function AnalyzePage() {
               </div>
             )}
 
-            {/* Actions */}
             <div className="flex gap-3 pt-2">
               <button
                 onClick={() => router.push(`/plants/${savedPlantId}`)}
