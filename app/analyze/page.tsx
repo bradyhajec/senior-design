@@ -527,8 +527,10 @@ export default function AnalyzePage() {
                   className="prose-plant text-sm"
                   dangerouslySetInnerHTML={{
                     __html: result.detailedAnalysis
-                      .replace(/## (.*)/g, '<h2>$1</h2>')
-                      .replace(/### (.*)/g, '<h3>$1</h3>')
+                      .replace(/^#### (.*)/gm, '<h4>$1</h4>')
+                      .replace(/^### (.*)/gm, '<h3>$1</h3>')
+                      .replace(/^## (.*)/gm, '<h2>$1</h2>')
+                      .replace(/^# (.*)/gm, '<h4>$1</h4>')
                       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                       .replace(/^- (.*)$/gm, '<li>$1</li>')
                       .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')

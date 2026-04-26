@@ -8,7 +8,7 @@ interface PlantCardProps {
 
 export default function PlantCard({ plant }: PlantCardProps) {
   const latestAssessment = plant.assessments[0] ?? null;
-  const nextReminder = plant.reminders.find(r => r.enabled);
+  const enabledReminders = plant.reminders.filter(r => r.enabled);
 
   return (
     <Link href={`/plants/${plant.plantId}`}>
@@ -35,26 +35,30 @@ export default function PlantCard({ plant }: PlantCardProps) {
 
         {/* Content */}
         <div className="p-4">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <h3
-                className="text-xl font-medium text-forest-700 leading-tight"
-                style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontWeight: 600 }}
-              >
-                {plant.nickname}
-              </h3>
-              <p className="text-sm text-forest-500 mt-0.5 italic">{plant.species || 'Unidentified'}</p>
-            </div>
-          </div>
+          <h3
+            className="text-xl font-medium text-forest-700 leading-tight"
+            style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontWeight: 600 }}
+          >
+            {plant.nickname}
+          </h3>
+          <p className="text-sm text-forest-500 mt-0.5 italic">{plant.species || 'Unidentified'}</p>
 
-          {/* Next reminder */}
-          {nextReminder && (
-            <div className="mt-3 flex items-center gap-1.5 text-xs text-forest-500">
-              <svg viewBox="0 0 24 24" className="w-3.5 h-3.5 fill-none stroke-current" strokeWidth="2">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7v5l3 3" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              Next: {nextReminder.reminderType} · {nextReminder.schedule}
+          {/* Reminder pills */}
+          {enabledReminders.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-1.5">
+              {enabledReminders.map((r) => (
+                <span
+                  key={r.reminderId}
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium text-cream-100"
+                  style={{ backgroundColor: '#c4714a' }}
+                >
+                  {r.reminderType === 'Watering' ? '💧'
+                    : r.reminderType === 'Fertilizing' ? '🌱'
+                    : r.reminderType === 'Pruning' ? '✂️'
+                    : '🌿'}
+                  {r.reminderType}
+                </span>
+              ))}
             </div>
           )}
 

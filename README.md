@@ -16,7 +16,7 @@ An intelligent plant identification, health assessment, and care guidance app bu
 ## Tech Stack
 
 - **Framework**: Next.js 14 (App Router)
-- **AI**: Anthropic Claude (claude-opus-4-6) via `@anthropic-ai/sdk`
+- **AI**: Plant API model https://ai-plant-care-production.up.railway.app
 - **Styling**: Tailwind CSS with custom botanical design system
 - **Typography**: Cormorant Garamond + DM Sans (Google Fonts)
 - **Storage**: Browser localStorage (no database required)
@@ -38,12 +38,10 @@ npm install
 cp .env.example .env.local
 ```
 
-Edit `.env.local` and add your Anthropic API key:
+Edit `.env.local` and add your Plant api url:
 ```
-ANTHROPIC_API_KEY=sk-ant-...
+PLANT_API_URL=https://ai-plant-care-production.up.railway.app
 ```
-
-Get your API key at [console.anthropic.com](https://console.anthropic.com)
 
 ### 3. Run locally
 
@@ -78,11 +76,10 @@ vercel --prod
 2. Go to [vercel.com](https://vercel.com) → **New Project**
 3. Import your GitHub repository
 4. In **Environment Variables**, add:
-   - Key: `ANTHROPIC_API_KEY`
-   - Value: `sk-ant-...`
+   - PLANT_API_URL=https://ai-plant-care-production.up.railway.app
 5. Click **Deploy**
 
-That's it! Vercel auto-detects Next.js and handles the build.
+Vercel auto-detects Next.js and handles the build.
 
 ## Project Structure
 

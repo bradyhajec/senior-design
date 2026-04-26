@@ -11,7 +11,7 @@ export default function PlantDetailPage() {
   const router = useRouter();
   const [plant, setPlant] = useState<Plant | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [activeTab, setActiveTab] = useState<'overview' | 'history' | 'reminders'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'history'>('overview');
   const [feedbackSubmitted, setFeedbackSubmitted] = useState<Record<string, boolean>>({});
   const [editingNickname, setEditingNickname] = useState(false);
   const [nicknameInput, setNicknameInput] = useState('');
@@ -79,6 +79,10 @@ export default function PlantDetailPage() {
     watering: '💧', light: '☀️', soil: '🪴', fertilizing: '🌱', pest: '🐛', general: '✦',
   };
 
+  const reminderIcons: Record<string, string> = {
+    Watering: '💧', Fertilizing: '🌱', Pruning: '✂️',
+  };
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f5f0e8' }}>
       <Header />
@@ -123,14 +127,8 @@ export default function PlantDetailPage() {
                     </button>
                   </div>
                 ) : (
-                  <button
-                    onClick={() => setEditingNickname(true)}
-                    className="group flex items-center gap-2 text-left"
-                  >
-                    <h1
-                      className="text-4xl font-medium text-forest-700"
-                      style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
-                    >
+                  <button onClick={() => setEditingNickname(true)} className="group flex items-center gap-2 text-left">
+                    <h1 className="text-4xl font-medium text-forest-700" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
                       {plant.nickname}
                     </h1>
                     <svg viewBox="0 0 24 24" className="w-4 h-4 fill-none stroke-forest-400 opacity-0 group-hover:opacity-100 transition-opacity" strokeWidth="2">
@@ -140,9 +138,7 @@ export default function PlantDetailPage() {
                   </button>
                 )}
                 <p className="text-forest-500 italic mt-0.5">{plant.species}</p>
-                <p className="text-xs text-forest-400 mt-1">
-                  Added {format(new Date(plant.createdAt), 'MMM d, yyyy')}
-                </p>
+                <p className="text-xs text-forest-400 mt-1">Added {format(new Date(plant.createdAt), 'MMM d, yyyy')}</p>
               </div>
             </div>
 
@@ -162,6 +158,41 @@ export default function PlantDetailPage() {
           </div>
         </div>
 
+        {/* Reminders */}
+        {plant.reminders.length > 0 && (
+          <div className="mb-6 animate-fade-up opacity-0 anim-delay-100" style={{ animationFillMode: 'forwards' }}>
+            <h3
+              className="text-lg font-medium text-forest-700 mb-3"
+              style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
+            >
+              Care Reminders
+            </h3>
+            <div className="grid grid-cols-2 gap-3">
+              {plant.reminders.map((reminder: Reminder) => (
+                <button
+                  key={reminder.reminderId}
+                  onClick={() => toggleReminder(reminder.reminderId)}
+                  className={`rounded-2xl p-4 text-left transition-all duration-200 border-2 ${
+                    reminder.enabled
+                      ? 'bg-terracotta-500 border-terracotta-600 text-cream-100'
+                      : 'bg-cream-100 border-terracotta-200 text-forest-400 opacity-60'
+                  }`}
+                >
+                  <div className="text-2xl mb-2">
+                    {reminderIcons[reminder.reminderType] ?? '🌿'}
+                  </div>
+                  <div className={`font-medium text-sm ${reminder.enabled ? 'text-cream-100' : 'text-forest-500'}`}>
+                    {reminder.reminderType}
+                  </div>
+                  <div className={`text-xs mt-0.5 ${reminder.enabled ? 'text-cream-200' : 'text-forest-400'}`}>
+                    {reminder.schedule}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Actions */}
         <div className="flex gap-3 mb-6 animate-fade-up opacity-0 anim-delay-100" style={{ animationFillMode: 'forwards' }}>
           <Link
@@ -180,14 +211,15 @@ export default function PlantDetailPage() {
 
         {/* Tabs */}
         <div className="flex gap-1 bg-cream-200 p-1 rounded-xl mb-6 animate-fade-up opacity-0 anim-delay-200" style={{ animationFillMode: 'forwards' }}>
-          {([['overview', 'Overview'], ['history', 'History'], ['reminders', 'Reminders']] as const).map(([tab, label]) => (
+          {([['overview', 'Overview'], ['history', 'History']] as const).map(([tab, label]) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${activeTab === tab
+              className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                activeTab === tab
                   ? 'bg-cream-100 text-forest-700 shadow-sm'
                   : 'text-forest-500 hover:text-forest-600'
-                }`}
+              }`}
             >
               {label}
             </button>
@@ -201,10 +233,7 @@ export default function PlantDetailPage() {
           {activeTab === 'overview' && latestAssessment && (
             <div className="space-y-5">
               <div className="bg-cream-100 border border-forest-200/30 rounded-2xl p-5">
-                <h3
-                  className="text-xl font-medium text-forest-700 mb-4"
-                  style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
-                >
+                <h3 className="text-xl font-medium text-forest-700 mb-4" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
                   Current Care Plan
                 </h3>
                 {latestAssessment.recommendations.length === 0 ? (
@@ -225,18 +254,17 @@ export default function PlantDetailPage() {
 
               {latestAssessment.rawAnalysis && (
                 <div className="bg-cream-100 border border-forest-200/30 rounded-2xl p-5">
-                  <h3
-                    className="text-xl font-medium text-forest-700 mb-4"
-                    style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}
-                  >
+                  <h3 className="text-xl font-medium text-forest-700 mb-4" style={{ fontFamily: 'Cormorant Garamond, Georgia, serif' }}>
                     Detailed Notes
                   </h3>
                   <div
                     className="prose-plant text-sm"
                     dangerouslySetInnerHTML={{
                       __html: latestAssessment.rawAnalysis
-                        .replace(/## (.*)/g, '<h2>$1</h2>')
-                        .replace(/### (.*)/g, '<h3>$1</h3>')
+                        .replace(/^#### (.*)/gm, '<h4>$1</h4>')
+                        .replace(/^### (.*)/gm, '<h3>$1</h3>')
+                        .replace(/^## (.*)/gm, '<h2>$1</h2>')
+                        .replace(/^# (.*)/gm, '<h4>$1</h4>')
                         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                         .replace(/^- (.*)$/gm, '<li>$1</li>')
                         .replace(/\n\n/g, '</p><p>')
@@ -306,51 +334,6 @@ export default function PlantDetailPage() {
                         Identified as <em>{assessment.prediction.label}</em> ({Math.round(assessment.prediction.confidence * 100)}% confidence)
                       </p>
                     )}
-                  </div>
-                ))
-              )}
-            </div>
-          )}
-
-          {/* Reminders tab */}
-          {activeTab === 'reminders' && (
-            <div className="space-y-3">
-              {plant.reminders.length === 0 ? (
-                <div className="text-center py-12 text-forest-400">
-                  No reminders set. Analyze your plant to get a care schedule.
-                </div>
-              ) : (
-                plant.reminders.map((reminder: Reminder) => (
-                  <div
-                    key={reminder.reminderId}
-                    className={`bg-cream-100 border rounded-2xl p-5 flex items-center justify-between transition-all duration-200 ${reminder.enabled ? 'border-forest-200/40' : 'border-forest-100 opacity-60'
-                      }`}
-                  >
-                    <div className="flex items-center gap-4">
-                      <div
-                        className={`w-10 h-10 rounded-full flex items-center justify-center text-lg ${reminder.enabled ? 'bg-forest-100' : 'bg-cream-300'
-                          }`}
-                      >
-                        {reminder.reminderType === 'Watering' ? '💧'
-                          : reminder.reminderType === 'Fertilizing' ? '🌱'
-                            : reminder.reminderType === 'Pruning' ? '✂️'
-                              : '🌿'}
-                      </div>
-                      <div>
-                        <p className="font-medium text-forest-700">{reminder.reminderType}</p>
-                        <p className="text-sm text-forest-400">{reminder.schedule}</p>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => toggleReminder(reminder.reminderId)}
-                      className={`relative w-12 h-6 rounded-full transition-all duration-200 ${reminder.enabled ? 'bg-forest-600' : 'bg-forest-200'
-                        }`}
-                    >
-                      <div
-                        className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-all duration-200 ${reminder.enabled ? 'left-7' : 'left-1'
-                          }`}
-                      />
-                    </button>
                   </div>
                 ))
               )}
