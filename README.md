@@ -39,6 +39,7 @@ cp .env.example .env.local
 ```
 
 Edit `.env.local` and add your Plant api url:
+
 ```
 PLANT_API_URL=https://ai-plant-care-production.up.railway.app
 ```
@@ -61,11 +62,13 @@ vercel
 ```
 
 Follow the prompts, then add your environment variable:
+
 ```bash
 vercel env add ANTHROPIC_API_KEY
 ```
 
 Then redeploy:
+
 ```bash
 vercel --prod
 ```
@@ -106,24 +109,24 @@ ai-plant-care/
 
 From the architectural spike, this app implements:
 
-| Entity | Implementation |
-|--------|---------------|
-| User | Browser session (localStorage) |
-| Plant | `Plant` interface with plantId, nickname, species |
-| Assessment | Nested in Plant, stores AI analysis results |
-| Photo | base64 encoded, stored in assessment |
-| SymptomReport | Text field in Assessment |
-| Prediction | species label + confidence score |
-| Recommendation | actionText + category |
-| Reminder | reminderType, schedule, enabled toggle |
-| Feedback | helpful/correct booleans + comment |
+| Entity         | Implementation                                    |
+| -------------- | ------------------------------------------------- |
+| User           | Browser session (localStorage)                    |
+| Plant          | `Plant` interface with plantId, nickname, species |
+| Assessment     | Nested in Plant, stores AI analysis results       |
+| Photo          | base64 encoded, stored in assessment              |
+| SymptomReport  | Text field in Assessment                          |
+| Prediction     | species label + confidence score                  |
+| Recommendation | actionText + category                             |
+| Reminder       | reminderType, schedule, enabled toggle            |
+| Feedback       | helpful/correct booleans + comment                |
 
 ## Team
 
 - Shelby Hampton
 - Brady Hajec
-- Colin Moore
 - Grayson Ryoo
+- Colin Moore
 - Kaden Range
 - Cooper Niebuhr
 
